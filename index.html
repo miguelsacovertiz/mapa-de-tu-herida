@@ -581,7 +581,12 @@
     align-items:center;
     justify-content:space-between;
     gap:12px;
-    margin-bottom:6px;
+    margin-bottom:18px;
+  }
+  .back-to-btn{
+    width:auto;
+    padding:10px 18px;
+    font-size:14px;
   }
   .back-link{
     background:none; border:none; cursor:pointer;
@@ -1421,7 +1426,7 @@
 
     app.innerHTML = `
       <div class="plan-header">
-        <button class="back-link" id="backToResult">← Volver al resultado</button>
+        <button class="btn btn-ghost back-to-btn" id="backToResult">← Volver a mi resultado</button>
       </div>
       <span class="eyebrow">Plan de 21 días · ${WOUNDS[state.resultKey].name}</span>
       <h2>Tu plan día a día</h2>
@@ -1499,7 +1504,7 @@
 
     app.innerHTML = `
       <div class="plan-header">
-        <button class="back-link" id="backFromDiario">← Volver</button>
+        <button class="btn btn-ghost back-to-btn" id="backFromDiario">← Volver a mi resultado</button>
       </div>
       <span class="eyebrow">Diario de activaciones${state.resultKey ? " · " + WOUNDS[state.resultKey].name : ""}</span>
       <h2>Tu diario</h2>
