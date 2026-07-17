@@ -131,15 +131,15 @@
     color:var(--cream);
   }
   h1{font-size:clamp(28px,5vw,36px); line-height:1.15;}
-  h2{font-size:26px; line-height:1.2;}
-  h3{font-size:19px; font-style:italic; font-weight:500; color:var(--gold-soft);}
+  h2{font-size:27px; line-height:1.25;}
+  h3{font-size:20px; font-style:italic; font-weight:500; color:var(--gold-soft);}
 
-  p{color:var(--cream-dim); margin:0 0 16px;}
+  p{color:var(--cream-dim); margin:0 0 16px; font-size:16.5px; line-height:1.55;}
 
   .btn{
     font-family:'Karla', sans-serif;
     font-weight:700;
-    font-size:16px;
+    font-size:17px;
     border:none;
     border-radius:999px;
     padding:16px 28px;
@@ -222,7 +222,7 @@
     border-radius:14px;
     padding:16px 18px;
     font-family:'Karla', sans-serif;
-    font-size:15.5px;
+    font-size:17px;
     cursor:pointer;
     transition:border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
     display:flex;
@@ -291,8 +291,8 @@
     font-family:'Fraunces', serif;
     font-style:italic;
     font-weight:500;
-    font-size:22px;
-    line-height:1.35;
+    font-size:23px;
+    line-height:1.4;
     color:var(--gold-soft);
     margin:0 0 26px;
     padding:0 0 0 16px;
@@ -320,7 +320,7 @@
     display:block;
     margin-bottom:6px;
   }
-  .lens-box p{font-size:14px; margin:0; color:var(--cream-dim);}
+  .lens-box p{font-size:16.5px; margin:0; color:var(--cream-dim);}
 
   .secondary-wound{
     background:rgba(181,106,88,0.08);
@@ -332,7 +332,7 @@
   .secondary-wound summary{
     cursor:pointer;
     font-family:'Karla', sans-serif;
-    font-size:13.5px;
+    font-size:15px;
     font-weight:600;
     color:var(--rose-soft);
     list-style:none;
@@ -354,9 +354,9 @@
     font-family:'Fraunces', serif;
     font-style:italic;
     color:var(--gold-soft);
-    font-size:15px;
+    font-size:16px;
   }
-  .secondary-wound-body p{font-size:14px; color:var(--cream-dim);}
+  .secondary-wound-body p{font-size:16px; color:var(--cream-dim);}
 
   /* ---------- Result ---------- */
   .mask-tag{
@@ -394,7 +394,7 @@
     display:block;
     margin-bottom:8px;
   }
-  .pattern-box p{font-size:14px; margin:0; color:var(--cream-dim);}
+  .pattern-box p{font-size:16.5px; margin:0; color:var(--cream-dim);}
 
   .divider{
     border:none;
@@ -428,7 +428,7 @@
     width:26px;
     flex-shrink:0;
   }
-  .pstep p{margin:0; font-size:14.5px;}
+  .pstep p{margin:0; font-size:16.5px;}
   .pstep b{color:var(--cream);}
 
   .timer-wrap{
@@ -498,7 +498,7 @@
     padding:13px 18px;
     color:var(--cream);
     font-family:'Karla', sans-serif;
-    font-size:14.5px;
+    font-size:16px;
   }
   .email-input::placeholder{color:var(--lav);}
   .email-input:focus-visible{outline:2px solid var(--gold-soft); outline-offset:2px;}
@@ -524,7 +524,7 @@
     padding:14px 16px;
     color:var(--cream);
     font-family:'Karla', sans-serif;
-    font-size:14.5px;
+    font-size:16px;
     resize:vertical;
     min-height:80px;
   }
@@ -542,7 +542,7 @@
     border-radius:14px;
     padding:14px 16px;
   }
-  .diary-entry p{margin:0; font-size:14px; color:var(--cream-dim); white-space:pre-wrap;}
+  .diary-entry p{margin:0; font-size:16px; color:var(--cream-dim); white-space:pre-wrap;}
   .diary-entry-head{
     display:flex; align-items:center; justify-content:space-between;
     margin-bottom:8px;
@@ -675,13 +675,13 @@
     font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
     color:var(--gold-soft); display:block; margin-bottom:8px;
   }
-  .day-panel h3{font-style:normal; color:var(--cream); font-size:19px; margin-bottom:10px;}
-  .day-panel p{font-size:14.5px; margin-bottom:18px;}
+  .day-panel h3{font-style:normal; color:var(--cream); font-size:20px; margin-bottom:10px;}
+  .day-panel p{font-size:16.5px; margin-bottom:18px;}
 
   .day-affirmation{
     font-family:'Fraunces', serif;
     font-style:italic;
-    font-size:16px;
+    font-size:17px;
     color:var(--gold-soft);
     background:rgba(0,0,0,0.15);
     border-radius:12px;
@@ -737,6 +737,28 @@
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   }catch(e){ console.warn("Supabase no se pudo inicializar", e); }
+
+  // ---------------- ACCESO PAGADO (Hotmart) ----------------
+  // Consulta la Edge Function "check-access" en vez de la tabla directamente,
+  // para no exponer la lista de compradores al navegador.
+  const CHECK_ACCESS_URL = SUPABASE_URL + "/functions/v1/check-access";
+
+  // true = tiene acceso, false = confirmado que no compró, null = no se pudo verificar (fallo tecnico)
+  async function checkPurchaseAccess(email){
+    try{
+      const res = await fetch(CHECK_ACCESS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      if(!res.ok) return null;
+      const data = await res.json();
+      return !!data.allowed;
+    }catch(e){
+      console.warn("No se pudo verificar el acceso pagado", e);
+      return null;
+    }
+  }
 
   // ---------------- DATA ----------------
   const WOUNDS = {
@@ -1101,8 +1123,25 @@
 
     const btn = document.getElementById("loginBtn");
     btn.disabled = true;
-    btn.textContent = "Cargando...";
+    btn.textContent = "Verificando tu compra...";
 
+    const allowed = await checkPurchaseAccess(email);
+
+    if(allowed === false){
+      btn.disabled = false;
+      btn.textContent = "Continuar";
+      msg.innerHTML = `<div class="success-note" style="color:var(--rose-soft);">No encontramos tu compra. Si acabas de pagar, espera unos segundos y vuelve a intentar, o escríbenos a arohasac@gmail.com.</div>`;
+      return;
+    }
+
+    if(allowed === null){
+      btn.disabled = false;
+      btn.textContent = "Continuar";
+      msg.innerHTML = `<div class="success-note" style="color:var(--rose-soft);">No pudimos verificar tu acceso en este momento. Intenta de nuevo en unos segundos.</div>`;
+      return;
+    }
+
+    btn.textContent = "Cargando...";
     state.email = email;
     localStorage.setItem("mapa_herida_last_email", email);
     await loadUserData();
@@ -1157,7 +1196,7 @@
     app.innerHTML = `
       <span class="qcount">Afirmación ${state.qIndex + 1} de ${state.quizItems.length}</span>
       <h2>${item.t}</h2>
-      <p style="font-size:13px; color:var(--lav);">¿Con qué frecuencia te pasa esto?</p>
+      <p style="font-size:15px; color:var(--lav);">¿Con qué frecuencia te pasa esto?</p>
       <div class="options">
         ${LIKERT.map(opt => `
           <button class="option" data-v="${opt.v}" tabindex="0">
@@ -1303,7 +1342,7 @@
 
       <div class="close-card">
         <h3 style="font-style:normal; color:var(--cream); font-size:17px;">¿Quieres ir más profundo?</h3>
-        <p style="font-size:14px;">La Experiencia AROHA incluye una sesión 1:1 por videollamada o WhatsApp con coach certificado, revisión de tu proceso al día 7, y orientación específica para tu herida. 13 años acompañando estos procesos en Arequipa, Perú.</p>
+        <p style="font-size:16px;">La Experiencia AROHA incluye una sesión 1:1 por videollamada o WhatsApp con coach certificado, revisión de tu proceso al día 7, y orientación específica para tu herida. 13 años acompañando estos procesos en Arequipa, Perú.</p>
         <a class="btn btn-primary" href="https://wa.me/51989812579" target="_blank" rel="noopener" style="text-decoration:none; margin-top:6px;">Escribir por WhatsApp</a>
       </div>
 
@@ -1500,7 +1539,7 @@
         </div>
         <p>${escapeHtml(e.note)}</p>
       </div>
-    `).join("") : `<p style="font-size:14px;">Todavía no tienes registros. Cada vez que tu herida se active y uses el protocolo, anota aquí qué lo disparó y cómo te fue — con el tiempo vas a ver el patrón debilitarse.</p>`;
+    `).join("") : `<p style="font-size:16px;">Todavía no tienes registros. Cada vez que tu herida se active y uses el protocolo, anota aquí qué lo disparó y cómo te fue — con el tiempo vas a ver el patrón debilitarse.</p>`;
 
     app.innerHTML = `
       <div class="plan-header">
